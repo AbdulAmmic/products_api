@@ -1,7 +1,7 @@
 const { required, number } = require('joi');
 const mongoose = require('mongoose');
 
-let requiredField = "the field is required";
+let requiredField = "The field is required";
 const productsSchema = mongoose.Schema(
     {
         name: {
@@ -25,7 +25,7 @@ const productsSchema = mongoose.Schema(
         image: {
             type: String,
             required: false,
-        }
+        },
 
     },
 
