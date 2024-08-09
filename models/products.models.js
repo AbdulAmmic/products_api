@@ -2,7 +2,7 @@ const { required, number } = require('joi');
 const mongoose = require('mongoose');
 
 let requiredField = "The field is required";
-const productsSchema = mongoose.Schema(
+const productsSchema = new mongoose.Schema(
     {
         name: {
             type: String,
@@ -27,6 +27,17 @@ const productsSchema = mongoose.Schema(
             required: false,
         },
 
+        category: {
+            type: String,
+            required: false,
+            default: 'Others'   
+        },
+        purchased: {
+            type: Number,
+            required: false,
+
+        }
+
     },
 
     {
@@ -34,6 +45,25 @@ const productsSchema = mongoose.Schema(
     }
 );
 
-const product = mongoose.model('products', productsSchema);
+const  salesSchema = new mongoose.Schema(
+    {
+        
+        productId: {
+            type: String,
 
-module.exports = product;
+        },
+        quantity: {
+            type: String
+        },
+        
+        
+    },
+   { timestamps: true}
+);
+
+const product = mongoose.model('products', productsSchema);
+const sales = mongoose.model('sales', salesSchema);
+
+module.exports = {product, sales};
+
+

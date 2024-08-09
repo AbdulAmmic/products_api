@@ -1,11 +1,12 @@
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
-const Product = require('./models/products.models'); 
+const {Product, sales} = require('./models/products.models'); 
 const bcrypt = require('bcryptjs');
 const User = require('./models/user.models');
 const jwt = require('jsonwebtoken');
-
+const product = require('./models/products.models');
+// const math = require('Math');
 app.use(express.json());
 
 const secretKey = "7ue!5S63%63HS";
@@ -139,9 +140,92 @@ app.delete('/api/products/:id',  async (req, res) => {
     }
 });
 
+app.get('/api/generalAggregate', async (req, res) => {
+    try {
+        const products = await product.find({});
+        
+        const totalSum = products.reduce((sum, product) => sum + product.price, 0);
+
+        return res.status(200).json({ prices: products.map(product => product.price), totalPrice: totalSum, totalProducts: products.length });
+    } catch (error) {
+        return res.status(500).json({ error: 'Something went wrong!' });
+    }
+});
+
+app.get('/api/aggregate', async (req, res)=>{
+   try {
+    const products = await Product.find({});
+    const aggregate = await product.aggregate([
+        {
+
+        $group:{
+            _id: '$category',
+            totalSales: {$sum : "$price"}
+        }
+
+        },
+
+        {
+            $sort: {
+                totalSales: 1
+            }
+        }
+        
+]);
+   return res.status(200).json(aggregate);
+   } catch (error) {
+    res.status(500).json({message: error});
+    // throw error;
+   }
+});
+
+app.get('/api/aggregateDaily', async (req, res)=>{
+    const dailyAggregate =  await Product.aggregate([
+    {
+        $group: {
+            _id:{
+                day: {$dayOfMonth: "$createdAt" },
+                month: {$month: "$createdAt"},
+                year: {$year: "$createdAt"}
+
+            },
+            totalAmount: {$sum: "$price"},
+            count: {$sum: 1}
+          
+        },
+       
+    },
+    {
+        $sort: {"_id.year": 1, "_id.month": 1, "_id.day": 1}
+    },
+    ]);
+
+   return res.status(200).json({dailyAggregate});
+
+});
+
+app.post('/api/sales', async (req, res)=>{
+try {
+    const _sales = await sales.create(req.body);
+    return res.status(201).json({_sales});
+
+} catch (error) {
+
+    res.status(500).json({message: error});
+    
+}
+
+});
+
+app.get('/api/sales', async (req, res)=>{
+     const  _sales = await sales.find({});
+    
+    return res.status(200).json({_sales});
+});
+
 const port = process.env.PORT || 4000;
 
-mongoose.connect('mongodb+srv://ammuhammad7535:ammic123@ammic.md1f4nt.mongodb.net/NodeApi?retryWrites=true&w=majority&appName=ammic')
+mongoose.connect('mongodb+srv://abdurrahmanammic:HFWSXlCxB58Nm89b@ecommerce-inventory.t6dpv.mongodb.net/?retryWrites=true&w=majority&appName=ecommerce-inventory')
     .then(() => {
         app.listen(port, () => {
             console.log(`Running on ${port}`);
