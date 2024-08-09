@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
-const {Product, sales} = require('./models/products.models'); 
+const {Product, sales, categories} = require('./models/products.models'); 
 const bcrypt = require('bcryptjs');
 const User = require('./models/user.models');
 const jwt = require('jsonwebtoken');
@@ -221,6 +221,29 @@ app.get('/api/sales', async (req, res)=>{
      const  _sales = await sales.find({});
     
     return res.status(200).json({_sales});
+});
+
+app.post('/api/categories', async(req, res)=>{
+   try {
+
+    const category = await categories.create(req.body);
+    return res.status(201).json({category});
+
+   } catch (error) {
+    res.status(500).json({message: error})
+   }
+    
+});
+
+
+app.get('/api/categories', async(req, res)=>{
+   try {
+    const category = await categories.find({});
+    return res.status(200).json(category);
+   } catch (error) {
+    res.status(200).json({message: error})
+   }
+
 });
 
 const port = process.env.PORT || 4000;

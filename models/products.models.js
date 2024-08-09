@@ -27,7 +27,7 @@ const productsSchema = new mongoose.Schema(
             required: false,
         },
 
-        category: {
+        categoryId: {
             type: String,
             required: false,
             default: 'Others'   
@@ -61,9 +61,19 @@ const  salesSchema = new mongoose.Schema(
    { timestamps: true}
 );
 
+const categorySchema = new mongoose.Schema(
+    {
+        categoryName: {
+            type: String,
+            required: true,
+        }
+    }
+);
+
 const product = mongoose.model('products', productsSchema);
 const sales = mongoose.model('sales', salesSchema);
+const categories = mongoose.model('categories', categorySchema);
 
-module.exports = {product, sales};
+module.exports = {product, sales, categories};
 
 
