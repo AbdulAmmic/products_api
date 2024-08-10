@@ -6,7 +6,7 @@ const bcrypt = require('bcryptjs');
 const User = require('./models/user.models');
 const jwt = require('jsonwebtoken');
 const product = require('./models/products.models');
-// const math = require('Math');
+
 app.use(express.json());
 
 const secretKey = "7ue!5S63%63HS";
@@ -37,7 +37,7 @@ const authenticateToken = (req, res, next) => {
 app.post('/api/signup', async (req, res) => {
     try {
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
-        const user = await User.create({ username: req.body.username, password: hashedPassword });
+        const user = await User.create({ username: req.body.username, password: hashedPassword, store: req.body.store });
         res.status(201).json(user);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -244,6 +244,19 @@ app.get('/api/categories', async(req, res)=>{
     res.status(200).json({message: error})
    }
 
+});
+
+app.delete('/api/categories/:id', async(req, res)=>{
+    try {
+        const id = req.params.id
+        const category = await categories.findOneAndDelete(id);
+            return res.send(`Successfully Deleted ${category.categoryName}`);
+            
+
+    } catch (error) {
+     
+        res.status(500).json({message: `We have problem with deleting ${id}`});
+    }
 });
 
 const port = process.env.PORT || 4000;
